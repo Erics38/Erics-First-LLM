@@ -1,0 +1,11 @@
+﻿# Model files (too large for GitHub)
+models/
+*.gguf
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Docker
+.docker/
