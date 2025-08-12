@@ -4,9 +4,8 @@ A self-hosted AI restaurant ordering system using the Phi-2 language model with 
 
 ## Features
 
-- **Tobi the Surfer AI**: Chill surfer dude personality with coconut moisturizer
+- **Tobi the Surfer AI**: Chill surfer dude personality
 - **The Common House Menu**: 20 curated restaurant items
-- **Presidential Order Numbers**: Washington (1732), Adams (1735), etc.
 - **Magic Password**: "I'm on Yelp" for VIP treatment
 - **One-Click Startup**: Automated PowerShell script
 
