@@ -55,7 +55,7 @@ graph TB
     end
     
     subgraph "Tobi's Personality"
-        CHAR["Surfer Dude AI<br/>Coconut moisturizer<br/>North shore surfing<br/>Free surf lessons<br/>Chill responses<br/>Magic password: I'm on Yelp"]
+        CHAR["Surfer Dude AI<br/>North shore surfing<br/>Free surf lessons<br/>Chill responses<br/>Magic password: I'm on Yelp"]
     end
     
     U1 -.->|Opens HTML file| HTML2
