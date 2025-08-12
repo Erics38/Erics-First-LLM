@@ -1,6 +1,6 @@
 # Tobi's Restaurant - Local LLM API
 
-A self-hosted AI restaurant ordering system using the Phi-2 language model with Docker and n8n integration.
+A self-hosted AI restaurant ordering system using the Phi-2 language model with Docker
 
 ## Features
 
