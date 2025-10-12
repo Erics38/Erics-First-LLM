@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # Restaurant AI Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restaurant-ai
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persistent data storage
+      - ./data:/app/data
+      # Logs (optional - for debugging)
+      - ./logs:/app/logs
+      # Model files (if using llama.cpp)
+      - ./models:/app/models:ro  # Read-only
+      # Hot reload for development (comment out for production)
+      - ./app:/app/app
+    environment:
+      # Override settings via environment variables
+      - ENVIRONMENT=production
+      - HOST=0.0.0.0
+      - PORT=8000
+      - LOG_LEVEL=INFO
+      # Database
+      - DATABASE_URL=sqlite:///./data/orders.db
+      # Restaurant
+      - RESTAURANT_NAME=The Common House
+      # Security
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      # CORS (adjust for production)
+      - ALLOWED_ORIGINS=*
+      # Features
+      - ENABLE_MAGIC_PASSWORD=true
+      - MAGIC_PASSWORD=i'm on yelp
+      # AI Settings (enabled by default)
+      - USE_LOCAL_AI=${USE_LOCAL_AI:-true}
+      - LLAMA_SERVER_URL=${LLAMA_SERVER_URL:-http://llama-server:8080}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - restaurant-network
+
+  # ===== AI Server (Always enabled by default) =====
+  llama-server:
+    image: ghcr.io/ggerganov/llama.cpp:server
+    container_name: restaurant-ai-llama
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./models:/models:ro
+    command: >
+      -m /models/phi-2.Q4_K_M.gguf
+      --host 0.0.0.0
+      --port 8080
+      --ctx-size 4096
+    environment:
+      - LLAMA_ARG_N_GPU_LAYERS=0  # CPU only (set to 35 for GPU)
+    networks:
+      - restaurant-network
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s  # Model takes time to load
+    restart: unless-stopped
+
+networks:
+  restaurant-network:
+    driver: bridge

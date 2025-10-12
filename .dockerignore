@@ -1,0 +1,67 @@
+# Don't include these in Docker builds (faster builds)
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Tests
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs (will be created in container)
+logs/
+*.log
+
+# Database (will be created in container)
+data/*.db
+data/*.sqlite
+
+# Models (mounted as volume)
+models/*.gguf
+models/*.bin
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Scripts
+start-*.sh
+start-*.bat
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.backup
+*.bak

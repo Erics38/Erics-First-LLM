@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Common House - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f7f7f8;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 1.5rem;
+        }
+
+        .menu-link {
+            background: #4299e1;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .menu-link:hover {
+            background: #3182ce;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 1rem;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 100%;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: #4299e1;
+        }
+
+        .message.assistant .message-avatar {
+            background: #48bb78;
+        }
+
+        .message-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            max-width: 70%;
+            line-height: 1.5;
+        }
+
+        .message.user .message-content {
+            background: #4299e1;
+            color: white;
+        }
+
+        .input-container {
+            padding: 1rem 0 2rem;
+            background: white;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .input-form {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .message-input:focus {
+            border-color: #4299e1;
+        }
+
+        .send-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 24px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .send-button:hover:not(:disabled) {
+            background: #3182ce;
+        }
+
+        .send-button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            color: #718096;
+            font-style: italic;
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .menu-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .menu-modal.show {
+            display: flex;
+        }
+
+        .menu-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .close-menu {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .menu-category {
+            margin-bottom: 2rem;
+        }
+
+        .menu-category h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #4299e1;
+            padding-bottom: 0.5rem;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .menu-item-info h4 {
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .menu-item-info p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .menu-item-price {
+            color: #4299e1;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍽️ The Common House</h1>
+        <a href="#" class="menu-link" onclick="showMenu()">View Menu</a>
+    </div>
+
+    <div class="chat-container">
+        <div class="messages" id="messages">
+            <div class="message assistant">
+                <div class="message-avatar">🏄‍♂️</div>
+            	<div class="message-content">
+    Hey dude! I'm Tobi, your chill restaurant assistant. I can help you check out our menu and get you some rad food. What's up?
+		</div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="message-avatar">🏄‍♂️</div>
+            <div>Tobes is thinking...</div>
+        </div>
+    </div>
+
+    <div class="input-container">
+        <form class="input-form" onsubmit="sendMessage(event)">
+            <input 
+                type="text" 
+                class="message-input" 
+                id="messageInput" 
+                placeholder="Ask about our menu or place an order..."
+                disabled
+            >
+            <button type="submit" class="send-button" id="sendButton" disabled>Send</button>
+        </form>
+    </div>
+
+    <!-- Menu Modal -->
+    <div class="menu-modal" id="menuModal">
+        <div class="menu-content">
+            <button class="close-menu" onclick="hideMenu()">&times;</button>
+            <h2>The Common House Menu</h2>
+            <div id="menuContent">Loading menu...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let sessionId = generateSessionId();
+        let menuData = null;
+
+        function generateSessionId() {
+            return 'session_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        async function loadMenu() {
+            try {
+                const response = await fetch(`${API_URL}/menu`);
+                menuData = await response.json();
+                renderMenu();
+                enableChat();
+            } catch (error) {
+                console.error('Failed to load menu:', error);
+                document.getElementById('menuContent').innerHTML = 'Failed to load menu. Please make sure the API is running.';
+            }
+        }
+
+        function renderMenu() {
+            const menuContent = document.getElementById('menuContent');
+            let html = '';
+
+            const categories = ['starters', 'mains', 'desserts', 'drinks'];
+            categories.forEach(category => {
+                html += `<div class="menu-category">`;
+                html += `<h3>${category}</h3>`;
+                
+                menuData[category].forEach(item => {
+                    html += `
+                        <div class="menu-item">
+                            <div class="menu-item-info">
+                                <h4>${item.name}</h4>
+                                <p>${item.description}</p>
+                            </div>
+                            <div class="menu-item-price">$${item.price.toFixed(2)}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            });
+
+            menuContent.innerHTML = html;
+        }
+
+        function enableChat() {
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('sendButton').disabled = false;
+            document.getElementById('messageInput').placeholder = "Ask about our menu or place an order...";
+        }
+
+        function showMenu() {
+            document.getElementById('menuModal').classList.add('show');
+        }
+
+        function hideMenu() {
+            document.getElementById('menuModal').classList.remove('show');
+        }
+
+        function addMessage(content, isUser = false) {
+            const messagesContainer = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${isUser ? '👤' : '🏄‍♂️'}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showLoading() {
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('show');
+        }
+
+        async function sendMessage(event) {
+            event.preventDefault();
+            
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, true);
+            input.value = '';
+            
+            // Show loading
+            showLoading();
+            
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId
+                    })
+                });
+                
+                const data = await response.json();
+
+                hideLoading();
+
+                if (!response.ok) {
+                    // Handle HTTP errors (422, 500, etc.)
+                    const errorMsg = data.detail || data.error || 'Server error occurred';
+                    console.error('Server error:', errorMsg, data);
+                    addMessage(`Sorry, there was an error: ${errorMsg}`);
+                } else if (data.error) {
+                    addMessage(`Sorry, there was an error: ${data.error}`);
+                } else if (data.response) {
+                    addMessage(data.response);
+
+                    if (data.has_magic_password) {
+                        addMessage("🌟 Dude, VIP status detected! I can totally customize any dish for you, bro.");
+                    }
+                } else {
+                    console.error('Unexpected response:', data);
+                    addMessage('Sorry, got an unexpected response from the server.');
+                }
+                
+            } catch (error) {
+                hideLoading();
+                addMessage("Whoa dude, I'm having trouble connecting to the kitchen. Make sure the API is running and we'll get you sorted!");
+                console.error('Chat error:', error);
+            }
+        }
+
+        // Load menu on page load
+        window.addEventListener('load', loadMenu);
+
+        // Handle enter key
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage(e);
+            }
+        });
+    </script>
+</body>
+</html>
