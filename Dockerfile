@@ -2,7 +2,7 @@
 # Multi-stage build for smaller image size
 
 # ===== Build Stage =====
-FROM python:3.11-slim as builder
+FROM python:3.14-slim as builder
 
 # Set working directory
 WORKDIR /app
@@ -19,7 +19,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
 # ===== Runtime Stage =====
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 # Create non-root user for security
 RUN useradd --create-home --shell /bin/bash appuser
