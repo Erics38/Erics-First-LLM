@@ -96,9 +96,7 @@ class TestOrderResponse:
     def test_valid_order_response(self):
         """Test creating a valid order response."""
         items = [OrderItem(name="Burger", price=16.00, quantity=2)]
-        response = OrderResponse(
-            success=True, order_number=1789, items=items, total=32.00, message="Order confirmed!"
-        )
+        response = OrderResponse(success=True, order_number=1789, items=items, total=32.00, message="Order confirmed!")
         assert response.success is True
         assert response.order_number == 1789
         assert response.total == 32.00
