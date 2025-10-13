@@ -5,7 +5,6 @@ Tobi AI - Menu-aware chatbot with surfer personality.
 import random
 import logging
 import httpx
-from typing import Optional
 
 from .menu_data import MENU_DATA
 from .config import settings
@@ -21,7 +20,7 @@ TOBI_RESPONSES = {
         "Hey there! Tobi here, ready to hook you up with some tasty grub!",
     ],
     "menu": [
-        "Our menu is totally rad! We got everything from Truffle Fries to Lobster Mac & Cheese. What sounds good to you?",
+        "Our menu is totally rad! We got everything from Truffle Fries to Lobster Mac. What sounds good to you?",
         "Bro, we've got the sickest menu! Check out our starters, mains, desserts, and drinks!",
     ],
     "order": [
@@ -133,12 +132,19 @@ def get_tobi_response(prompt: str, is_vip: bool = False) -> str:
             surfer_adjectives = ["rad", "killer", "awesome", "sick", "gnarly", "stellar", "epic"]
             adj = random.choice(surfer_adjectives)
 
-            return f"Oh dude, the {item['name']} is {adj}! It's {item['description']} - totally worth the ${item['price']:.2f}. Want me to add it to your order?"
+            price_str = f"${item['price']:.2f}"
+            return (
+                f"Oh dude, the {item['name']} is {adj}! It's {item['description']} - "
+                f"totally worth the {price_str}. Want me to add it to your order?"
+            )
         else:
             # Multiple matches
             item_names = [item[1]["name"] for item in menu_matches[:3]]
             if len(item_names) == 2:
-                return f"Nice! We've got {item_names[0]} and {item_names[1]}. Both are super tasty bro! Which one sounds good?"
+                return (
+                    f"Nice! We've got {item_names[0]} and {item_names[1]}. "
+                    f"Both are super tasty bro! Which one sounds good?"
+                )
             else:
                 items_str = ", ".join(item_names[:-1]) + f", and {item_names[-1]}"
                 return f"Dude, we've got {items_str}! All of them are awesome. What are you feeling?"
@@ -159,7 +165,10 @@ def get_tobi_response(prompt: str, is_vip: bool = False) -> str:
 
     # Check for price-related questions
     if any(word in prompt_lower for word in ["price", "cost", "how much", "expensive"]):
-        return "Our prices are super fair dude! Starters are around $11-16, mains are $16-32, and drinks are $11-14. Want to see the full menu?"
+        return (
+            "Our prices are super fair dude! Starters are around $11-16, "
+            "mains are $16-32, and drinks are $11-14. Want to see the full menu?"
+        )
 
     # Default responses
     return random.choice(TOBI_RESPONSES["default"])

@@ -5,7 +5,6 @@ Main application with all endpoints, logging, and error handling.
 
 import logging
 import uuid
-from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -58,7 +57,7 @@ if static_dir.exists():
 @app.on_event("startup")
 async def startup_event():
     """Run on application startup."""
-    logger.info(f"Starting Restaurant AI v1.0.0")
+    logger.info("Starting Restaurant AI v1.0.0")
     logger.info(f"Environment: {settings.environment}")
     logger.info(f"Database: {settings.database_url}")
     logger.info(f"CORS Origins: {settings.allowed_origins_list}")
