@@ -30,10 +30,10 @@ jobs:
         pip install pytest pytest-asyncio pytest-cov black flake8 mypy
 
     - name: Run Black (code formatting check)
-      run: black --check app/
+      run: black --check app/ tests/ --line-length=120
 
     - name: Run Flake8 (linting)
-      run: flake8 app/ --max-line-length=120 --extend-ignore=E203,W503
+      run: flake8 app/ tests/ --max-line-length=120 --extend-ignore=E203,W503
 
     - name: Run MyPy (type checking)
       run: mypy app/ --ignore-missing-imports

@@ -2,6 +2,7 @@
 Restaurant AI - FastAPI Application
 Main application with all endpoints, logging, and error handling.
 """
+
 import logging
 import uuid
 from datetime import datetime
@@ -12,11 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .config import settings
-from .models import (
-    ChatRequest, ChatResponse,
-    OrderRequest, OrderResponse, OrderStatus,
-    HealthResponse
-)
+from .models import ChatRequest, ChatResponse, OrderRequest, OrderResponse, OrderStatus, HealthResponse
 from .database import db
 from .tobi_ai import get_tobi_response_async
 from .menu_data import MENU_DATA, get_next_order_number
@@ -27,11 +24,8 @@ log_dir.mkdir(exist_ok=True)
 
 logging.basicConfig(
     level=getattr(logging, settings.log_level),
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(settings.log_file),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler(settings.log_file), logging.StreamHandler()],
 )
 
 logger = logging.getLogger(__name__)
@@ -84,6 +78,7 @@ async def shutdown_event():
 
 # ===== API Endpoints =====
 
+
 @app.get("/", tags=["Root"])
 async def root():
     """Root endpoint with basic info."""
@@ -92,7 +87,7 @@ async def root():
         "restaurant": settings.restaurant_name,
         "message": "Tobi is ready to serve you!",
         "version": "1.0.0",
-        "docs": "/api/docs" if settings.is_development else None
+        "docs": "/api/docs" if settings.is_development else None,
     }
 
 
@@ -108,12 +103,7 @@ async def health_check():
         logger.warning("Health check failed: Database disconnected")
         raise HTTPException(status_code=503, detail="Database unavailable")
 
-    return HealthResponse(
-        status="healthy",
-        environment=settings.environment,
-        database=db_status,
-        version="1.0.0"
-    )
+    return HealthResponse(status="healthy", environment=settings.environment, database=db_status, version="1.0.0")
 
 
 @app.get("/menu", tags=["Menu"])
@@ -149,7 +139,7 @@ async def chat(request: ChatRequest):
             response=ai_response,
             session_id=session_id,
             has_magic_password=has_magic_password,
-            restaurant=settings.restaurant_name
+            restaurant=settings.restaurant_name,
         )
 
     except Exception as e:
@@ -190,7 +180,7 @@ async def create_order(request: OrderRequest):
             order_number=order_number,
             items=request.items,
             total=total,
-            message=f"Order #{order_number} confirmed! Your food will be ready shortly."
+            message=f"Order #{order_number} confirmed! Your food will be ready shortly.",
         )
 
     except ValueError as e:
@@ -242,5 +232,5 @@ if __name__ == "__main__":
         host=settings.host,
         port=settings.port,
         reload=settings.is_development,
-        log_level=settings.log_level.lower()
+        log_level=settings.log_level.lower(),
     )

@@ -1,6 +1,7 @@
 """
 Database operations for order management.
 """
+
 import sqlite3
 import json
 import logging
@@ -49,7 +50,8 @@ class Database:
         """Initialize database schema."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('''
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS orders (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     order_number INTEGER UNIQUE NOT NULL,
@@ -59,18 +61,23 @@ class Database:
                     status TEXT NOT NULL DEFAULT 'pending',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
-            ''')
+            """
+            )
 
             # Create index for faster lookups
-            cursor.execute('''
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_order_number
                 ON orders(order_number)
-            ''')
+            """
+            )
 
-            cursor.execute('''
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_session_id
                 ON orders(session_id)
-            ''')
+            """
+            )
 
             logger.info(f"Database initialized at {self.db_path}")
 
@@ -78,7 +85,7 @@ class Database:
         """Get total number of orders."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT COUNT(*) FROM orders')
+            cursor.execute("SELECT COUNT(*) FROM orders")
             count = cursor.fetchone()[0]
             return count
 
@@ -87,10 +94,13 @@ class Database:
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute('''
+                cursor.execute(
+                    """
                     INSERT INTO orders (order_number, session_id, items, total, status)
                     VALUES (?, ?, ?, ?, ?)
-                ''', (order_number, session_id, json.dumps([item.dict() for item in items]), total, 'confirmed'))
+                """,
+                    (order_number, session_id, json.dumps([item.dict() for item in items]), total, "confirmed"),
+                )
 
                 logger.info(f"Order {order_number} created successfully")
                 return True
@@ -105,11 +115,14 @@ class Database:
         """Retrieve an order by order number."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('''
+            cursor.execute(
+                """
                 SELECT order_number, items, total, status, created_at
                 FROM orders
                 WHERE order_number = ?
-            ''', (order_number,))
+            """,
+                (order_number,),
+            )
 
             result = cursor.fetchone()
 
@@ -121,7 +134,7 @@ class Database:
                 "items": json.loads(result[1]),
                 "total": result[2],
                 "status": result[3],
-                "created_at": result[4]
+                "created_at": result[4],
             }
 
     def health_check(self) -> bool:
@@ -129,7 +142,7 @@ class Database:
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute('SELECT 1')
+                cursor.execute("SELECT 1")
                 return True
         except Exception as e:
             logger.error(f"Database health check failed: {e}")

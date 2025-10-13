@@ -1,6 +1,7 @@
 """
 Tobi AI - Menu-aware chatbot with surfer personality.
 """
+
 import random
 import logging
 import httpx
@@ -35,7 +36,7 @@ TOBI_RESPONSES = {
         "Right on! Anything else I can help you with?",
         "Cool cool! What else can I do for ya?",
         "For sure! Let me know if you need anything else!",
-    ]
+    ],
 }
 
 
@@ -62,12 +63,12 @@ def find_menu_item(query: str) -> list[tuple[str, dict]]:
         "fries": ["fries", "frite"],
         "salad": ["cobb"],
         "cocktail": ["martini", "negroni", "margarita", "fashioned", "sour"],
-        "dessert": ["torte", "cake", "pudding"]
+        "dessert": ["torte", "cake", "pudding"],
     }
 
     # Extract food-related keywords from query
     query_words = query_lower.split()
-    food_keywords = [w.rstrip('s?!.,') for w in query_words if len(w) > 3]
+    food_keywords = [w.rstrip("s?!.,") for w in query_words if len(w) > 3]
 
     # Search through all menu categories
     for category in ["starters", "mains", "desserts", "drinks"]:
@@ -135,7 +136,7 @@ def get_tobi_response(prompt: str, is_vip: bool = False) -> str:
             return f"Oh dude, the {item['name']} is {adj}! It's {item['description']} - totally worth the ${item['price']:.2f}. Want me to add it to your order?"
         else:
             # Multiple matches
-            item_names = [item[1]['name'] for item in menu_matches[:3]]
+            item_names = [item[1]["name"] for item in menu_matches[:3]]
             if len(item_names) == 2:
                 return f"Nice! We've got {item_names[0]} and {item_names[1]}. Both are super tasty bro! Which one sounds good?"
             else:
@@ -152,7 +153,7 @@ def get_tobi_response(prompt: str, is_vip: bool = False) -> str:
             "The Short Rib Pappardelle is insane bro - super popular!",
             "Can't go wrong with our House Smash Burger - it's a crowd favorite!",
             "The Truffle Fries are a total hit, dude!",
-            "Everyone loves the Lobster Mac & Cheese - it's next level!"
+            "Everyone loves the Lobster Mac & Cheese - it's next level!",
         ]
         return random.choice(popular_items)
 
@@ -215,8 +216,8 @@ STARTERS:
                     "prompt": f"{menu_context}\n\nCustomer: {prompt}\nTobi:",
                     "max_tokens": 100,
                     "temperature": 0.7,
-                    "stop": ["\n", "Customer:", "Tobi:"]
-                }
+                    "stop": ["\n", "Customer:", "Tobi:"],
+                },
             )
             response.raise_for_status()
             result = response.json()

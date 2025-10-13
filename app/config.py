@@ -2,6 +2,7 @@
 Configuration management using environment variables.
 Uses pydantic-settings for type-safe configuration.
 """
+
 from pathlib import Path
 from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -40,12 +41,7 @@ class Settings(BaseSettings):
     enable_magic_password: bool = True
     magic_password: str = "i'm on yelp"
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="ignore"
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore")
 
     @property
     def allowed_origins_list(self) -> list[str]:
